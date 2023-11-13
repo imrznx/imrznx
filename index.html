@@ -1,50 +1,55 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ImageKit Upload</title>
-</head>
-<body>
+<form action="#" onsubmit="upload()">
+	<input type="file" id="file1" />
+	<input type="submit" />
+</form>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 
-    <input type="file" id="imageInput" accept="image/*">
-    <button onclick="uploadImage()">Upload Image</button>
-
-    <script>
-        function uploadImage() {
-            const input = document.getElementById('imageInput');
-            const file = input.files[0];
-
-            if (file) {
-                const apiKey = 'public_je/X0Dlpa7ZPF77hoMM2wk6eYB0=';
-                const apiSecret = 'private_CmNnILwe8LWxxz4vglIfVpxxF5E=';
-                const endpoint = 'https://api.imagekit.io/v1/files/upload';
-
-                const formData = new FormData();
-                formData.append('file', file);
-
-                fetch(endpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Basic ${btoa(apiKey + ':' + apiSecret)}`
-                    },
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Image uploaded successfully:', data);
-                    alert('Image uploaded successfully!');
-                })
-                .catch(error => {
-                    console.error('Error uploading image:', error);
-                    alert('Error uploading image. Please try again.');
-                });
-            } else {
-                alert('Please select an image file.');
-            }
-        }
-    </script>
-
-</body>
-</html>
+<script>
+	// This endpoint should be implemented on your server as shown above 
+	var authenticationEndpoint = "https://imrznx.github.io/imrznx/";
+	
+	function upload() {
+	    var file = document.getElementById("file1");
+		var formData = new FormData();
+		formData.append("file", file.files[0]);
+		formData.append("fileName", "abc.jpg");
+	
+		// Let's get the token from server side
+		$.ajax({
+		    url : authenticationEndpoint,
+		    method : "POST",
+		    contentType: "application/json",
+            data: JSON.stringify({
+                uploadPayload: {
+                    fileName: "abc.jpg"
+                },
+                expire: 3600,
+                publicKey: "public_je/X0Dlpa7ZPF77hoMM2wk6eYB0="
+            }),
+		    success : function(body) {
+		        formData.append("token", body.token);
+	
+				// Now call ImageKit.io upload API v2
+		        $.ajax({
+		            url : "https://upload.imagekit.io/api/v2/files/upload",
+		            method : "POST",
+		            mimeType : "multipart/form-data",
+		            dataType : "json",
+		            data : formData,
+		            processData : false,
+		            contentType : false,
+		            error : function(jqxhr, text, error) {
+		                console.log(error)
+		            },
+		            success : function(body) {
+		                console.log(body)
+		            }
+		        });
+	
+		    },
+		    error : function(jqxhr, text, error) {
+		        console.log(arguments);
+		    }
+		});
+	}
+</script>
