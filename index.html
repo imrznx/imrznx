@@ -1,9 +1,50 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ImageKit Upload</title>
+</head>
 <body>
 
-<h1>My First Heading</h1>
-<p>My first paragraph.</p>
+    <input type="file" id="imageInput" accept="image/*">
+    <button onclick="uploadImage()">Upload Image</button>
+
+    <script>
+        function uploadImage() {
+            const input = document.getElementById('imageInput');
+            const file = input.files[0];
+
+            if (file) {
+                const apiKey = 'public_je/X0Dlpa7ZPF77hoMM2wk6eYB0=';
+                const apiSecret = 'private_CmNnILwe8LWxxz4vglIfVpxxF5E=';
+                const endpoint = 'https://api.imagekit.io/v1/files/upload';
+
+                const formData = new FormData();
+                formData.append('file', file);
+
+                fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Basic ${btoa(apiKey + ':' + apiSecret)}`
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Image uploaded successfully:', data);
+                    alert('Image uploaded successfully!');
+                })
+                .catch(error => {
+                    console.error('Error uploading image:', error);
+                    alert('Error uploading image. Please try again.');
+                });
+            } else {
+                alert('Please select an image file.');
+            }
+        }
+    </script>
 
 </body>
 </html>
